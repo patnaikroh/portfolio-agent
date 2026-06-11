@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portfolio Agent — XH9107</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f5f0;color:#1a1a18;min-height:100vh;}
+.app{max-width:1100px;margin:0 auto;padding:16px;}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;background:#fff;border-radius:12px;border:0.5px solid #e0dfd8;margin-bottom:12px;}
+.logo{font-size:15px;font-weight:500;display:flex;align-items:center;gap:8px;}
+.logo-icon{width:22px;height:22px;background:#e6f1fb;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px;}
+.badge{font-size:10px;padding:2px 9px;border-radius:20px;font-weight:500;}
+.blive{background:#e1f5ee;color:#0f6e56;}
+.bwarn{background:#fef3dc;color:#8a5a00;}
+.berr{background:#faece7;color:#993c1d;}
+.topbar-right{display:flex;align-items:center;gap:10px;}
+.upd-time{font-size:11px;color:#888780;}
+.rbtn{font-size:12px;padding:5px 12px;border-radius:20px;border:0.5px solid #d3d1c7;background:#fff;cursor:pointer;color:#5f5e5a;display:flex;align-items:center;gap:5px;}
+.rbtn:hover{background:#f1efe8;}
+.tabs{display:flex;gap:2px;background:#fff;border-radius:12px;border:0.5px solid #e0dfd8;padding:8px 12px;margin-bottom:12px;overflow-x:auto;}
+.tab{font-size:13px;padding:7px 16px;cursor:pointer;color:#888780;border-radius:8px;border:none;background:transparent;white-space:nowrap;font-weight:400;}
+.tab.active{color:#1a1a18;background:#f1efe8;font-weight:500;}
+.panel{display:none;flex-direction:column;gap:12px;}
+.panel.active{display:flex;}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+.metric{background:#fff;border-radius:10px;border:0.5px solid #e0dfd8;padding:12px 14px;}
+.mlabel{font-size:11px;color:#888780;margin-bottom:3px;}
+.mval{font-size:18px;font-weight:500;}
+.msub{font-size:11px;margin-top:3px;}
+.up{color:#0f6e56;}.dn{color:#993c1d;}
+.card{background:#fff;border-radius:12px;border:0.5px solid #e0dfd8;overflow:hidden;}
+.tcard{border:0.5px solid #e0dfd8;border-radius:10px;overflow:hidden;margin-bottom:6px;background:#fff;}
+.thdr{display:flex;align-items:center;justify-content:space-between;padding:11px 16px;cursor:pointer;}
+.thdr:hover{background:#f9f8f5;}
+.tleft{display:flex;align-items:center;gap:9px;}
+.tdot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.tname{font-size:13px;font-weight:500;}
+.tcnt{font-size:11px;color:#888780;}
+.tright{display:flex;align-items:center;gap:12px;}
+.tstat{font-size:12px;color:#888780;}
+.pill{display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:500;}
+.pup{background:#e1f5ee;color:#0f6e56;}
+.pdn{background:#faece7;color:#993c1d;}
+.tbar{padding:0 16px 10px;}
+.tbar-bg{height:4px;background:#e0dfd8;border-radius:2px;}
+.tbar-fill{height:100%;border-radius:2px;}
+.tchips{display:none;flex-wrap:wrap;gap:5px;padding:0 16px 14px;}
+.tchips.open{display:flex;}
+.chip{font-size:11px;padding:3px 9px;border-radius:20px;font-family:monospace;border:0.5px solid transparent;cursor:default;}
+.tbl-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:12px;}
+th{text-align:left;padding:9px 10px;font-weight:500;color:#888780;font-size:11px;border-bottom:0.5px solid #e0dfd8;cursor:pointer;white-space:nowrap;background:#f9f8f5;}
+th:hover{color:#1a1a18;}
+td{padding:9px 10px;border-bottom:0.5px solid #f1efe8;white-space:nowrap;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:#fafaf8;}
+.tkr{font-weight:500;font-family:monospace;font-size:12px;}
+.tpill{display:inline-block;padding:1px 7px;border-radius:20px;font-size:10px;font-weight:500;}
+.frow{display:flex;gap:8px;flex-wrap:wrap;padding:12px 16px;border-bottom:0.5px solid #e0dfd8;background:#f9f8f5;}
+.frow input,.frow select{font-size:12px;padding:6px 10px;border:0.5px solid #d3d1c7;border-radius:8px;background:#fff;color:#1a1a18;}
+.frow input{flex:1;min-width:140px;}
+.chat-wrap{display:flex;flex-direction:column;gap:10px;padding:16px;}
+.cmsgs{display:flex;flex-direction:column;gap:8px;min-height:200px;max-height:360px;overflow-y:auto;background:#f9f8f5;border-radius:10px;padding:14px;border:0.5px solid #e0dfd8;}
+.msg{display:flex;gap:8px;align-items:flex-start;}
+.avt{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;flex-shrink:0;}
+.avt-ai{background:#e6f1fb;color:#185fa5;}
+.avt-u{background:#f1efe8;border:0.5px solid #d3d1c7;color:#5f5e5a;}
+.bbl{font-size:13px;line-height:1.65;padding:9px 12px;border-radius:10px;background:#fff;border:0.5px solid #e0dfd8;max-width:88%;color:#1a1a18;}
+.bbl.u{background:#e6f1fb;border-color:transparent;color:#0c447c;}
+.msg.u{flex-direction:row-reverse;}
+.qbtns{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:4px;}
+.qbtn{font-size:11px;padding:5px 11px;border-radius:20px;border:0.5px solid #d3d1c7;background:#fff;cursor:pointer;color:#5f5e5a;}
+.qbtn:hover{background:#f1efe8;color:#1a1a18;}
+.irow{display:flex;gap:8px;margin-top:4px;}
+.irow input{flex:1;font-size:13px;padding:9px 12px;border:0.5px solid #d3d1c7;border-radius:10px;background:#fff;}
+.irow input:focus{outline:none;border-color:#378add;}
+.irow button{padding:9px 18px;font-size:13px;border-radius:10px;border:0.5px solid #d3d1c7;background:#1a1a18;color:#fff;cursor:pointer;white-space:nowrap;}
+.irow button:hover{background:#333;}
+.ll{font-size:12px;color:#888780;padding:4px 0;}
+.mftbl th,.mftbl td{padding:9px 12px;}
+.live-dot{display:inline-block;width:6px;height:6px;background:#0f6e56;border-radius:50%;margin-left:4px;vertical-align:middle;}
+@media(max-width:600px){.metrics{grid-template-columns:repeat(2,1fr);}.topbar{flex-direction:column;gap:8px;align-items:flex-start;}}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <div class="logo">
+      <div class="logo-icon">📈</div>
+      Portfolio Agent
+      <span class="badge bwarn" id="live-badge">⏳ Loading…</span>
+    </div>
+    <div class="topbar-right">
+      <span class="upd-time" id="upd-time"></span>
+      <button class="rbtn" onclick="loadPrices()">↻ Refresh prices</button>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="sw('themes')">Themes</button>
+    <button class="tab" onclick="sw('holdings')">All Holdings</button>
+    <button class="tab" onclick="sw('mf')">Mutual Funds</button>
+    <button class="tab" onclick="sw('chat')">Ask Agent</button>
+  </div>
+
+  <div class="panel active" id="p-themes">
+    <div class="metrics" id="m-themes"></div>
+    <div id="tgrid"></div>
+  </div>
+
+  <div class="panel" id="p-holdings">
+    <div class="card">
+      <div class="frow">
+        <input type="text" id="srch" placeholder="Search ticker…" oninput="rt()" />
+        <select id="tf" onchange="rt()"><option value="">All themes</option></select>
+        <select id="sc" onchange="rt()">
+          <option value="val">Sort: Value ↓</option>
+          <option value="plpct">Sort: P&L% ↓</option>
+          <option value="ticker">Sort: A-Z</option>
+        </select>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr>
+            <th onclick="srt('ticker')">Ticker</th>
+            <th onclick="srt('theme')">Theme</th>
+            <th>Qty</th>
+            <th onclick="srt('avg')">Avg buy</th>
+            <th>Live LTP</th>
+            <th onclick="srt('val')">Value</th>
+            <th onclick="srt('pl')">P&L ₹</th>
+            <th onclick="srt('plpct')">P&L %</th>
+          </tr></thead>
+          <tbody id="htb"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" id="p-mf">
+    <div class="metrics" id="m-mf"></div>
+    <div class="card">
+      <div class="tbl-wrap">
+        <table class="mftbl">
+          <thead><tr><th>Fund</th><th>Type</th><th>Qty</th><th>Avg NAV</th><th>Curr NAV</th><th>Value</th><th>P&L ₹</th><th>P&L %</th></tr></thead>
+          <tbody id="mftb"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" id="p-chat">
+    <div class="card">
+      <div class="chat-wrap">
+        <div class="qbtns">
+          <button class="qbtn" onclick="qa('Which theme has the highest allocation and am I too concentrated?')">Theme concentration ↗</button>
+          <button class="qbtn" onclick="qa('Which theme is performing best vs worst on P&L%?')">Theme performance ↗</button>
+          <button class="qbtn" onclick="qa('Which positions in my Others bucket should I consider exiting?')">Clean up Others ↗</button>
+          <button class="qbtn" onclick="qa('Give me a full health check across all 5 themes.')">Health check ↗</button>
+          <button class="qbtn" onclick="qa('Which of my losers are structural problems vs temporary dips?')">Losers review ↗</button>
+          <button class="qbtn" onclick="qa('Which stocks have the highest unrealized gains and what are the LTCG tax implications?')">Tax & LTCG ↗</button>
+        </div>
+        <div class="cmsgs" id="cmsgs">
+          <div class="msg">
+            <div class="avt avt-ai">✦</div>
+            <div class="bbl">Your live portfolio agent is ready — 58 equity positions mapped to 5 themes, plus 10 mutual funds. Live prices load from your Google Sheet automatically. Ask me anything!</div>
+          </div>
+        </div>
+        <div class="ll" id="ll" style="display:none">Agent is thinking…</div>
+        <div class="irow">
+          <input type="text" id="ci" placeholder="Ask about your portfolio, themes, or specific stocks…" onkeydown="if(event.key==='Enter')send()" />
+          <button onclick="send()">Ask ↗</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const APPS_SCRIPT_URL="https://script.google.com/macros/s/AKfycbz5jc33sTNzNbRrXsDsaldqfADusz5E-9G-bSGZ4QG1q-8DPLuvkw9OQqSvawv97c0Y-Q/exec";
+const ANTHROPIC_API="https://api.anthropic.com/v1/messages";
+
+const TH={
+  "Data Centres & Semiconductors":{c:"#378ADD",bg:"#E6F1FB",tx:"#0C447C"},
+  "Power":{c:"#E8A020",bg:"#FEF3DC",tx:"#633806"},
+  "Capital Markets":{c:"#1D9E75",bg:"#E1F5EE",tx:"#085041"},
+  "Defence":{c:"#D85A30",bg:"#FAECE7",tx:"#712B13"},
+  "Infrastructure":{c:"#7F77DD",bg:"#EEEDFE",tx:"#3C3489"},
+  "Others":{c:"#888780",bg:"#F1EFE8",tx:"#444441"},
+};
+
+// Base data from Zerodha upload 11 Jun 2026
+// avg = average buy price (from Zerodha), l = LTP (will be replaced by live price)
+const BASE=[
+  {t:"KAYNES",    th:"Data Centres & Semiconductors", q:64,    a:3744.96},
+  {t:"AEROFLEX",  th:"Data Centres & Semiconductors", q:200,   a:417.79},
+  {t:"AVALON",    th:"Data Centres & Semiconductors", q:842,   a:882.65},
+  {t:"E2E",       th:"Data Centres & Semiconductors", q:840,   a:282.42},
+  {t:"CEMPRO",    th:"Data Centres & Semiconductors", q:369,   a:569.80},
+  {t:"BBOX",      th:"Data Centres & Semiconductors", q:130,   a:1066.00},
+  {t:"TECHNOE",   th:"Data Centres & Semiconductors", q:178,   a:1366.67},
+  {t:"NETWEB",    th:"Data Centres & Semiconductors", q:27,    a:4595.71},
+  {t:"CPPLUS",    th:"Data Centres & Semiconductors", q:86,    a:2873.31},
+  {t:"TATAPOWER", th:"Power",                         q:874,   a:308.31},
+  {t:"NLCINDIA",  th:"Power",                         q:1481,  a:249.26},
+  {t:"IEX",       th:"Power",                         q:1000,  a:127.37},
+  {t:"KPIGREEN",  th:"Power",                         q:1034,  a:313.93},
+  {t:"INOXGREEN", th:"Power",                         q:939,   a:188.73},
+  {t:"SUZLON",    th:"Power",                         q:4300,  a:54.30},
+  {t:"WAAREEENER",th:"Power",                         q:147,   a:2916.06},
+  {t:"HSCL",      th:"Power",                         q:855,   a:166.67},
+  {t:"POLYCAB",   th:"Power",                         q:158,   a:2601.48},
+  {t:"ABB",       th:"Power",                         q:44,    a:5818.60},
+  {t:"BSE",       th:"Capital Markets",               q:601,   a:1067.30},
+  {t:"MCX",       th:"Capital Markets",               q:310,   a:2020.10},
+  {t:"MOTILALOS", th:"Capital Markets",               q:439,   a:804.03},
+  {t:"NUVAMA",    th:"Capital Markets",               q:377,   a:1337.01},
+  {t:"360ONE",    th:"Capital Markets",               q:272,   a:1068.98},
+  {t:"HDFCAMC",   th:"Capital Markets",               q:126,   a:2270.13},
+  {t:"JIOFIN",    th:"Capital Markets",               q:3733,  a:277.53},
+  {t:"APOLLO",    th:"Defence",                       q:2355,  a:192.95},
+  {t:"BEL",       th:"Defence",                       q:1094,  a:353.36},
+  {t:"GRSE",      th:"Defence",                       q:159,   a:2456.38},
+  {t:"HAL",       th:"Defence",                       q:57,    a:4017.33},
+  {t:"MAZDOCK",   th:"Defence",                       q:128,   a:2428.81},
+  {t:"ZENTEC",    th:"Defence",                       q:338,   a:1532.05},
+  {t:"BALUFORGE", th:"Defence",                       q:422,   a:457.93},
+  {t:"HFCL",      th:"Defence",                       q:600,   a:179.03},
+  {t:"LT",        th:"Infrastructure",                q:188,   a:2182.40},
+  {t:"DESCO-MT",  th:"Infrastructure",                q:3000,  a:179.58},
+  {t:"PSPPROJECT",th:"Infrastructure",                q:185,   a:828.11},
+  {t:"ETERNAL",   th:"Others",                        q:2009,  a:200.46},
+  {t:"OFSS",      th:"Others",                        q:49,    a:3827.79},
+  {t:"POLICYBZR", th:"Others",                        q:214,   a:1556.97},
+  {t:"RELIANCE",  th:"Others",                        q:1189,  a:1200.23},
+  {t:"ICICIBANK", th:"Others",                        q:386,   a:918.99},
+  {t:"HDFCBANK",  th:"Others",                        q:2387,  a:744.31},
+  {t:"HEROMOTOCO",th:"Others",                        q:69,    a:3680.94},
+  {t:"M&M",       th:"Others",                        q:139,   a:1820.03},
+  {t:"VEDL",      th:"Others",                        q:582,   a:470.72},
+  {t:"SWIGGY",    th:"Others",                        q:1,     a:421.70},
+  {t:"SYNCOMF",   th:"Others",                        q:13000, a:19.16},
+  {t:"PATELSAI-XT",th:"Others",                       q:300,   a:352.02},
+  {t:"SILVER-E",  th:"Others",                        q:1890,  a:148.05},
+  {t:"HDFCSILVER-E",th:"Others",                      q:460,   a:166.55},
+  {t:"MON100-E",  th:"Others",                        q:965,   a:274.15},
+  {t:"CHAMBLEFERT",th:"Others",                       q:200,   a:479.05},
+];
+
+const MF=[
+  {n:"HDFC Defence Fund",         tp:"Sectoral",   q:5590.40,  nav:21.46, cnav:28.93, inv:120052,  pv:161695},
+  {n:"HDFC Manufacturing Fund",   tp:"Sectoral",   q:29908.20, nav:10.47, cnav:11.36, inv:313202,  pv:339906},
+  {n:"HDFC Mid Cap Fund",         tp:"Mid Cap",    q:2929.47,  nav:201.60,cnav:220.41,inv:590609,  pv:645690},
+  {n:"HDFC Nifty 50 Index",       tp:"Index",      q:1797.77,  nav:230.83,cnav:226.36,inv:414884,  pv:406927},
+  {n:"HDFC Nifty Realty Index",   tp:"Index",      q:29167.30, nav:10.74, cnav:8.54,  inv:313241,  pv:249101},
+  {n:"HDFC Technology Fund",      tp:"Sectoral",   q:7434.90,  nav:13.99, cnav:11.14, inv:103986,  pv:82831},
+  {n:"ICICI PSU Equity Fund",     tp:"Sectoral",   q:14082.47, nav:21.17, cnav:22.91, inv:298228,  pv:322629},
+  {n:"Kotak Nifty Smallcap 50",   tp:"Index",      q:15804.23, nav:19.82, cnav:20.77, inv:313177,  pv:328349},
+  {n:"Nippon Power & Infra Fund", tp:"Sectoral",   q:1677.90,  nav:369.85,cnav:408.97,inv:620371,  pv:686014},
+  {n:"Sundaram Multi Asset Fund", tp:"Hybrid",     q:15330.67, nav:11.67, cnav:13.29, inv:178051,  pv:203744},
+];
+MF.forEach(f=>{f.pl=f.pv-f.inv;f.pp=((f.pv-f.inv)/f.inv)*100;});
+
+let EQ=BASE.map(h=>({...h,l:h.a,pl:0,pp:0,v:h.q*h.a,live:false}));
+
+const pct=n=>(n>=0?"+":"")+n.toFixed(1)+"%";
+const cr=n=>"₹"+(Math.abs(n)/100000).toFixed(1)+"L";
+const fi=n=>"₹"+Math.round(Math.abs(n)).toLocaleString("en-IN");
+const fmtN=n=>"₹"+n.toLocaleString("en-IN",{maximumFractionDigits:2});
+
+async function loadPrices(){
+  setBadge("bwarn","⏳ Fetching live prices…");
+  try{
+    const res=await fetch(APPS_SCRIPT_URL);
+    if(!res.ok)throw new Error("HTTP "+res.status);
+    const pm=await res.json();
+    let hits=0;
+    EQ=BASE.map(h=>{
+      const ltp=pm[h.t]||pm[h.t.replace(/[-&]/g,"")]||null;
+      const live=ltp!==null&&ltp>0;
+      if(live)hits++;
+      const price=live?ltp:h.a;
+      return{...h,l:price,pl:(price-h.a)*h.q,pp:((price-h.a)/h.a)*100,v:h.q*price,live};
+    });
+    const now=new Date();
+    document.getElementById("upd-time").textContent=`Updated ${now.toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit"})}`;
+    setBadge(hits>30?"blive":hits>0?"bwarn":"berr",
+      hits>30?`✓ Live · ${hits}/${BASE.length} prices`:
+      hits>0?`⚠ Partial · ${hits}/${BASE.length}`:
+      "⚠ Using Zerodha prices");
+  }catch(e){
+    setBadge("berr","⚠ Using Zerodha prices");
+    document.getElementById("upd-time").textContent="Sheet unreachable — showing 11 Jun prices";
+  }
+  renderAll();
+}
+
+function setBadge(cls,txt){const b=document.getElementById("live-badge");b.className="badge "+cls;b.textContent=txt;}
+function renderAll(){renderTM();renderTG();rt();renderMF();}
+function getTD(){
+  const m={};
+  EQ.forEach(h=>{
+    if(!m[h.th])m[h.th]={v:0,pl:0,inv:0,stocks:[]};
+    m[h.th].v+=h.v;m[h.th].pl+=h.pl;m[h.th].inv+=h.q*h.a;m[h.th].stocks.push(h.t);
+  });
+  return m;
+}
+
+function renderTM(){
+  const td=getTD();
+  const TEV=EQ.reduce((s,h)=>s+h.v,0),TEI=EQ.reduce((s,h)=>s+h.q*h.a,0),TEPL=EQ.reduce((s,h)=>s+h.pl,0);
+  const TMV=MF.reduce((s,f)=>s+f.pv,0);
+  const othV=td["Others"]?td["Others"].v:0,coreV=TEV-othV;
+  document.getElementById("m-themes").innerHTML=`
+    <div class="metric"><div class="mlabel">Total equity</div><div class="mval">${cr(TEV)}</div><div class="msub ${TEPL>=0?"up":"dn"}">${TEPL>=0?"+":""}${cr(TEPL)} gain · ${((TEPL/TEI)*100).toFixed(1)}%</div></div>
+    <div class="metric"><div class="mlabel">Thematic allocation</div><div class="mval">${Math.round(coreV/TEV*100)}%</div><div class="msub" style="color:#888780">${cr(coreV)} across 5 themes</div></div>
+    <div class="metric"><div class="mlabel">Others</div><div class="mval">${Math.round(othV/TEV*100)}%</div><div class="msub" style="color:#888780">${cr(othV)} · ${td["Others"]?td["Others"].stocks.length:0} stocks</div></div>
+    <div class="metric"><div class="mlabel">Total portfolio</div><div class="mval">${cr(TEV+TMV)}</div><div class="msub" style="color:#888780">Equity + MF combined</div></div>`;
+}
+
+function renderTG(){
+  const td=getTD(),TEV=EQ.reduce((s,h)=>s+h.v,0),g=document.getElementById("tgrid");g.innerHTML="";
+  Object.entries(TH).forEach(([theme,st])=>{
+    const d=td[theme]||{v:0,pl:0,inv:0,stocks:[]};
+    const ap=(d.v/TEV*100).toFixed(1),pp2=d.inv>0?((d.pl/d.inv)*100).toFixed(1):"0.0",up=d.pl>=0;
+    const id="ts_"+theme.replace(/\W/g,"_");
+    const div=document.createElement("div");div.className="tcard";
+    div.innerHTML=`
+      <div class="thdr" onclick="tog('${id}',this)">
+        <div class="tleft"><div class="tdot" style="background:${st.c}"></div><span class="tname">${theme}</span><span class="tcnt">${d.stocks.length} stocks</span></div>
+        <div class="tright"><span class="tstat">${cr(d.v)} · ${ap}%</span><span class="pill ${up?"pup":"pdn"}">${pct(parseFloat(pp2))}</span><span style="font-size:11px;color:#888780">▾</span></div>
+      </div>
+      <div class="tbar"><div class="tbar-bg"><div class="tbar-fill" style="width:${Math.min(parseFloat(ap)*2.2,100)}%;background:${st.c}"></div></div></div>
+      <div class="tchips" id="${id}">
+        ${d.stocks.map(s=>{const h=EQ.find(e=>e.t===s);const u=h.pl>=0;
+          return`<span class="chip" style="background:${st.bg};color:${st.tx};border-color:${st.c}40">${s} <span style="opacity:0.75">${pct(h.pp)}</span>${h.live?'<span style="color:#0f6e56">●</span>':''}</span>`;
+        }).join("")}
+      </div>`;
+    g.appendChild(div);
+  });
+}
+
+function tog(id,hdr){
+  document.getElementById(id).classList.toggle("open");
+  const span=hdr.querySelector("span[style*='font-size:11px']");
+  if(span)span.textContent=span.textContent==="▾"?"▴":"▾";
+}
+
+function popTF(){
+  const s=document.getElementById("tf");
+  Object.keys(TH).forEach(t=>{const o=document.createElement("option");o.value=t;o.textContent=t;s.appendChild(o);});
+}
+
+let scol="val";
+function srt(c){scol=c;document.getElementById("sc").value=c==="ticker"?"ticker":c==="plpct"?"plpct":"val";rt();}
+function rt(){
+  const TEV=EQ.reduce((s,h)=>s+h.v,0);
+  const srch=document.getElementById("srch").value.toLowerCase();
+  const tf=document.getElementById("tf").value;
+  scol=document.getElementById("sc").value;
+  let data=EQ.filter(h=>(!tf||h.th===tf)&&(!srch||h.t.toLowerCase().includes(srch)));
+  data.sort((a,b)=>scol==="ticker"?a.t.localeCompare(b.t):scol==="theme"?a.th.localeCompare(b.th):scol==="plpct"?b.pp-a.pp:scol==="pl"?b.pl-a.pl:scol==="avg"?b.a-a.a:b.v-a.v);
+  const tb=document.getElementById("htb");tb.innerHTML="";
+  data.forEach(h=>{
+    const up=h.pl>=0,al=(h.v/TEV*100).toFixed(1),st=TH[h.th];
+    const tr=document.createElement("tr");
+    tr.innerHTML=`
+      <td><span class="tkr">${h.t}</span>${h.live?'<span class="live-dot" title="Live price"></span>':''}</td>
+      <td><span class="tpill" style="background:${st.bg};color:${st.tx}">${h.th}</span></td>
+      <td>${h.q.toLocaleString()}</td>
+      <td style="color:#888780">${fmtN(h.a)}</td>
+      <td style="font-weight:500">${fmtN(h.l)}</td>
+      <td>${fi(h.v)} <span style="font-size:10px;color:#888780">${al}%</span></td>
+      <td><span class="pill ${up?"pup":"pdn"}">${up?"+":"−"}${fi(h.pl)}</span></td>
+      <td><span class="pill ${up?"pup":"pdn"}">${pct(h.pp)}</span></td>`;
+    tb.appendChild(tr);
+  });
+}
+
+function renderMF(){
+  const TMV=MF.reduce((s,f)=>s+f.pv,0),TMI=MF.reduce((s,f)=>s+f.inv,0),TMPL=MF.reduce((s,f)=>s+f.pl,0);
+  document.getElementById("m-mf").innerHTML=`
+    <div class="metric"><div class="mlabel">MF total value</div><div class="mval">${cr(TMV)}</div><div class="msub up">+${cr(TMPL)} gain</div></div>
+    <div class="metric"><div class="mlabel">Overall gain</div><div class="mval up">+${((TMPL/TMI)*100).toFixed(1)}%</div><div class="msub" style="color:#888780">10 funds</div></div>
+    <div class="metric"><div class="mlabel">In profit</div><div class="mval up">${MF.filter(f=>f.pl>=0).length}</div><div class="msub dn">${MF.filter(f=>f.pl<0).length} in red</div></div>
+    <div class="metric"><div class="mlabel">Best fund</div><div class="mval" style="font-size:14px">Defence +35%</div><div class="msub dn">Worst: Realty −21%</div></div>`;
+  const tb=document.getElementById("mftb");tb.innerHTML="";
+  MF.slice().sort((a,b)=>b.pv-a.pv).forEach(f=>{
+    const up=f.pl>=0;
+    const tr=document.createElement("tr");
+    tr.innerHTML=`
+      <td style="font-weight:500;font-size:12px">${f.n}</td>
+      <td><span class="tpill" style="background:#f1efe8;color:#5f5e5a">${f.tp}</span></td>
+      <td>${f.q.toLocaleString("en-IN",{maximumFractionDigits:2})}</td>
+      <td style="color:#888780">₹${f.nav.toFixed(2)}</td>
+      <td style="font-weight:500">₹${f.cnav.toFixed(2)}</td>
+      <td>${fi(f.pv)}</td>
+      <td><span class="pill ${up?"pup":"pdn"}">${up?"+":"−"}${fi(f.pl)}</span></td>
+      <td><span class="pill ${up?"pup":"pdn"}">${pct(f.pp)}</span></td>`;
+    tb.appendChild(tr);
+  });
+}
+
+function sw(tab){
+  const tabs=["themes","holdings","mf","chat"];
+  document.querySelectorAll(".tab").forEach((t,i)=>t.classList.toggle("active",tabs[i]===tab));
+  document.querySelectorAll(".panel").forEach(p=>p.classList.toggle("active",p.id==="p-"+tab));
+}
+
+function qa(q){sw("chat");document.getElementById("ci").value=q;send();}
+
+async function send(){
+  const TEV=EQ.reduce((s,h)=>s+h.v,0),TEI=EQ.reduce((s,h)=>s+h.q*h.a,0),TEPL=EQ.reduce((s,h)=>s+h.pl,0);
+  const TMV=MF.reduce((s,f)=>s+f.pv,0),TMPL=MF.reduce((s,f)=>s+f.pl,0),TMI=MF.reduce((s,f)=>s+f.inv,0);
+  const inp=document.getElementById("ci"),q=inp.value.trim();if(!q)return;
+  inp.value="";
+  const msgs=document.getElementById("cmsgs");
+  const ud=document.createElement("div");ud.className="msg u";
+  ud.innerHTML=`<div class="avt avt-u">U</div><div class="bbl u">${q}</div>`;
+  msgs.appendChild(ud);
+  const ll=document.getElementById("ll");ll.style.display="block";
+  msgs.scrollTop=msgs.scrollHeight;
+
+  const td=getTD();
+  const tc=Object.entries(td).map(([t,d])=>`${t}: ${d.stocks.length} stocks, ${cr(d.v)}, alloc ${(d.v/TEV*100).toFixed(1)}%, P&L ${d.inv>0?pct((d.pl/d.inv)*100):"N/A"}`).join("\n");
+  const ec=EQ.map(h=>`${h.t}(${h.th}): qty ${h.q}, avg ₹${h.a.toFixed(2)}, LTP ₹${h.l.toFixed(2)}${h.live?" [live]":""}, val ${fi(h.v)}, P&L ${pct(h.pp)}, alloc ${(h.v/TEV*100).toFixed(1)}%`).join("\n");
+  const mc=MF.map(f=>`${f.n}(${f.tp}): val ${fi(f.pv)}, P&L ${pct(f.pp)}`).join("\n");
+
+  try{
+    const res=await fetch(ANTHROPIC_API,{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        model:"claude-sonnet-4-20250514",
+        max_tokens:1000,
+        system:`You are a sharp, direct portfolio analyst for an Indian investor (Zerodha XH9107, as of 11 Jun 2026).
+
+PORTFOLIO SUMMARY:
+- Equity: ${cr(TEV)}, invested ${cr(TEI)}, gain +${((TEPL/TEI)*100).toFixed(1)}%
+- MF: ${cr(TMV)}, gain +${((TMPL/TMI)*100).toFixed(1)}%
+- Total: ${cr(TEV+TMV)}
+
+5 INVESTMENT THEMES:
+${tc}
+
+ALL EQUITY POSITIONS (avg buy from Zerodha; [live] = current Google Finance price):
+${ec}
+
+MUTUAL FUNDS:
+${mc}
+
+Rules: Be direct and use numbers. Flag real risks honestly. This is for information only — not financial advice. Keep responses under 220 words. Use ₹ for amounts.`,
+        messages:[{role:"user",content:q}]
+      })
+    });
+    const data=await res.json();
+    const txt=data.content?.map(c=>c.text||"").join("")||"Sorry, no response received.";
+    ll.style.display="none";
+    const ad=document.createElement("div");ad.className="msg";
+    ad.innerHTML=`<div class="avt avt-ai">✦</div><div class="bbl">${txt.replace(/\n/g,"<br>")}</div>`;
+    msgs.appendChild(ad);msgs.scrollTop=msgs.scrollHeight;
+  }catch(e){
+    ll.style.display="none";
+    const ed=document.createElement("div");ed.className="msg";
+    ed.innerHTML=`<div class="avt avt-ai">✦</div><div class="bbl" style="color:#993c1d">Something went wrong. Try again.</div>`;
+    msgs.appendChild(ed);
+  }
+}
+
+popTF();
+loadPrices();
+</script>
+</body>
+</html>
